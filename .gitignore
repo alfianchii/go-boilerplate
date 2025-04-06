@@ -1,6 +1,3 @@
-# Config files for tools like Air
-air.toml
-
 # Compiled binary files
 *.exe
 *.dll
