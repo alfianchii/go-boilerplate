@@ -1,8 +1,10 @@
 package configs
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -24,6 +26,7 @@ type Config struct {
 
 var (
 	Address = fmt.Sprintf("%s:%s", GetENV("APP_URL"), GetENV("APP_PORT"))
+	ExecTimeoutDuration = 10*time.Second
 )
 
 func InitENV() *Config {
@@ -53,4 +56,13 @@ func GetENV(key string) string {
 	}
 
 	return dotEnv[key]
+}
+
+func CtxTime() (context.Context, context.CancelFunc) {
+	ctx, cancel := context.WithTimeout(CtxBg(), ExecTimeoutDuration)
+	return ctx, cancel
+}
+
+func CtxBg() context.Context {
+	return context.Background()
 }
