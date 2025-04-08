@@ -12,7 +12,7 @@ import (
 )
 
 type AuthServiceInterface interface {
-	Login(ctx context.Context, creds models.LoginRequest) (string, error)
+	GenerateJWT(ctx context.Context, creds models.LoginRequest) (string, error)
 }
 
 type AuthService struct {
@@ -23,17 +23,17 @@ func NewAuthService(userRepo repositories.UserRepositoryInterface) AuthServiceIn
 	return &AuthService{userRepo: userRepo}
 }
 
-func (s *AuthService) Login(ctx context.Context, creds models.LoginRequest) (string, error) {
+func (s *AuthService) GenerateJWT(ctx context.Context, creds models.LoginRequest) (string, error) {
 	user, err := s.userRepo.FindByUsername(ctx, creds.Username)
 	if err != nil {
-		return "", errors.New("invalid username or password")
+		return "", errors.New(err.Error())
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password)); err != nil {
 		return "", errors.New("invalid username or password")
 	}
 
-	token, err := utils.GenerateJWT(user.ID, user.Role, configs.GetENV("JWT_SECRET"))
+	token, err := utils.GenerateJWT(user.ID, user.Username, configs.GetENV("JWT_SECRET"))
 	if err != nil {
 			return "", errors.New("failed to generate token")
 	}

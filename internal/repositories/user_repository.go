@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go-boilerplate/internal/database"
 	"go-boilerplate/internal/models"
 )
@@ -24,7 +25,8 @@ func (r *UserRepository) FindByUsername(ctx context.Context, username string) (*
 	row := r.DB.Pool.QueryRow(ctx,query, username)
 
 	var user models.User
-	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.Role)
+	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.CreatedBy, &user.UpdatedAt, &user.UpdatedBy, &user.DeletedAt, &user.DeletedBy)
+	fmt.Printf("User found: %+v\n", user)
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
