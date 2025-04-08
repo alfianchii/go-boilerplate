@@ -14,7 +14,6 @@ func SetHeaderJson(res http.ResponseWriter) {
 }
 
 func SendResponse(res http.ResponseWriter, msg string, status int, data interface{}) {
-	res.WriteHeader(status)
 	SetHeaderJson(res)
 
 	response := models.Response{
