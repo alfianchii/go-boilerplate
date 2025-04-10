@@ -10,6 +10,7 @@ import (
 
 type UserClaims struct {
 	UserID string   `json:"user_id"`
+	Username string   `json:"username"`
 	Roles  []models.Role `json:"roles"`
 	jwt.RegisteredClaims
 }
@@ -17,6 +18,7 @@ type UserClaims struct {
 func GenerateJWT(user *models.User, secret string) (string, error) {
 	claims := UserClaims{
 		UserID: user.ID,
+		Username: user.Username,
 		Roles:  user.Roles,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    user.Username,
