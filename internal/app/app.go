@@ -13,6 +13,8 @@ type App struct {
 	UserRepo repositories.UserRepositoryInterface
 	AuthService services.AuthServiceInterface
 	AuthHandler handlers.AuthHandlerInterface
+	DashboardService services.DashboardServiceInterface
+	DashboardHandler handlers.DashboardHandlerInterface
 }
 
 func InitApp() *App {
@@ -23,10 +25,15 @@ func InitApp() *App {
 	authService := services.NewAuthService(userRepo)
 	authHandler := handlers.NewAuthHandler(authService)
 
+	dashboardService := services.NewDashboardService()
+	dashboardHandler := handlers.NewDashboardHandler(dashboardService)
+
 	return &App{
 		DB:          db,
 		UserRepo:    userRepo,
 		AuthService: authService,
 		AuthHandler: authHandler,
+		DashboardService: dashboardService,
+		DashboardHandler: dashboardHandler,
 	}
 }
