@@ -18,4 +18,5 @@ type User struct {
 	UpdatedBy *string `json:"updated_by"`
 	DeletedAt *time.Time `json:"deleted_at"`
 	DeletedBy *string `json:"deleted_by"`
+	Roles []Role `json:"roles"`
 }

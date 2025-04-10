@@ -24,7 +24,7 @@ func NewAuthService(userRepo repositories.UserRepositoryInterface) AuthServiceIn
 }
 
 func (s *AuthService) GenerateJWT(ctx context.Context, creds models.LoginRequest) (string, error) {
-	user, err := s.userRepo.FindByUsername(ctx, creds.Username)
+	user, err := s.userRepo.FindByUsernameWithRoles(ctx, creds.Username)
 	if err != nil {
 		return "", errors.New(err.Error())
 	}
@@ -33,7 +33,7 @@ func (s *AuthService) GenerateJWT(ctx context.Context, creds models.LoginRequest
 		return "", errors.New("invalid username or password")
 	}
 
-	token, err := utils.GenerateJWT(user.ID, user.Username, configs.GetENV("JWT_SECRET"))
+	token, err := utils.GenerateJWT(user, configs.GetENV("JWT_SECRET"))
 	if err != nil {
 			return "", errors.New("failed to generate token")
 	}

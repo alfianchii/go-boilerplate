@@ -26,10 +26,11 @@ func SendResponse(res http.ResponseWriter, msg string, status int, data interfac
 	json.NewEncoder(res).Encode(response)
 }
 
-func GenerateJWT(userID string, username string, secret string) (string, error) {
+func GenerateJWT(user *models.User, secret string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"username": username,
+		"user_id": user.ID,
+		"username": user.Username,
+		"roles": user.Roles,
 		"exp": jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 	})
 

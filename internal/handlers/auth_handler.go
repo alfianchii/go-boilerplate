@@ -36,5 +36,7 @@ func (h *AuthHandler) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	utils.SendResponse(res, "Login successful", http.StatusOK, map[string]string{"token": token})
+	utils.SendResponse(res, "Login successful", http.StatusOK, map[string]string{
+		"token": token,
+	})
 }
