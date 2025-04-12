@@ -11,6 +11,7 @@ import (
 type App struct {
 	DB *database.DB
 	UserRepo repositories.UserRepositoryInterface
+	SessionRepo repositories.SessionRepositoryInterface
 	AuthService services.AuthServiceInterface
 	AuthHandler handlers.AuthHandlerInterface
 	DashboardService services.DashboardServiceInterface
@@ -22,7 +23,8 @@ func InitApp() *App {
 	db := database.InitDB(cfg)
 
 	userRepo := repositories.NewUserRepository(db)
-	authService := services.NewAuthService(userRepo)
+	sessionRepo := repositories.NewSessionRepository(db)
+	authService := services.NewAuthService(userRepo, sessionRepo)
 	authHandler := handlers.NewAuthHandler(authService)
 
 	dashboardService := services.NewDashboardService()
@@ -31,6 +33,7 @@ func InitApp() *App {
 	return &App{
 		DB:          db,
 		UserRepo:    userRepo,
+		SessionRepo: sessionRepo,
 		AuthService: authService,
 		AuthHandler: authHandler,
 		DashboardService: dashboardService,

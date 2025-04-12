@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"go-boilerplate/internal/models"
 	"net/http"
+	"strings"
 )
 
 func SetHeaderJson(res http.ResponseWriter) {
@@ -21,4 +22,19 @@ func SendResponse(res http.ResponseWriter, msg string, status int, data interfac
 
 	res.WriteHeader(status)
 	json.NewEncoder(res).Encode(response)
+}
+
+func GetClientIP(r *http.Request) string {
+	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+		ips := strings.Split(xff, ",")
+		return strings.TrimSpace(ips[0])
+	}
+
+	if xri := r.Header.Get("X-Real-IP"); xri != "" {
+		return xri
+	}
+
+	ip := r.RemoteAddr
+	ip = strings.Split(ip, ":")[0]
+	return ip
 }

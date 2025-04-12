@@ -22,10 +22,10 @@ func NewUserRepository(db *database.DB) UserRepositoryInterface {
 
 func (r *UserRepository) FindByUsername(ctx context.Context, username string) (*models.User, error) {
 	query := `SELECT * FROM users WHERE username = $1`
-	row := r.DB.Pool.QueryRow(ctx,query, username)
+	row := r.DB.Pool.QueryRow(ctx, query, username)
 
 	var user models.User
-	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.CreatedBy, &user.UpdatedAt, &user.UpdatedBy, &user.DeletedAt, &user.DeletedBy)
+	err := row.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.CreatedBy, &user.UpdatedAt, &user.UpdatedBy, &user.DeletedAt, &user.DeletedBy)
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
@@ -36,12 +36,12 @@ func (r *UserRepository) FindByUsername(ctx context.Context, username string) (*
 func (r *UserRepository) FindByUsernameWithRoles(ctx context.Context, username string) (*models.User, error) {
 	query := `
 		SELECT
-			u.*,
-			r.*
-		FROM users u
-		LEFT JOIN user_roles ur ON u.user_id = ur.user_id
-		LEFT JOIN roles r ON ur.role_id = r.role_id
-		WHERE u.username = $1
+			users.*,
+			roles.*
+		FROM users
+		LEFT JOIN user_roles ON users.user_id = user_roles.user_id
+		LEFT JOIN roles ON user_roles.role_id = roles.role_id
+		WHERE users.username = $1
 	`
 
 	rows, err := r.DB.Pool.Query(ctx, query, username)
@@ -52,26 +52,16 @@ func (r *UserRepository) FindByUsernameWithRoles(ctx context.Context, username s
 
 	var user *models.User
 	var roles []models.Role
+	var role models.Role
 
 	for rows.Next() {
-		var role models.Role
-		if user == nil {
-			user = &models.User{}
-			err := rows.Scan(
-				&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.CreatedBy, &user.UpdatedAt, &user.UpdatedBy, &user.DeletedAt, &user.DeletedBy,
-				&role.ID, &role.Name, &role.CreatedAt, &role.CreatedBy, &role.UpdatedAt, &role.UpdatedBy, &role.DeletedAt, &role.DeletedBy,
-			)
-			if err != nil {
-				return nil, errors.New("failed to scan user and role")
-			}
-		} else {
-			err := rows.Scan(
-				nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
-				&role.ID, &role.Name, &role.CreatedAt, &role.CreatedBy, &role.UpdatedAt, &role.UpdatedBy, &role.DeletedAt, &role.DeletedBy,
-			)
-			if err != nil {
-				return nil, errors.New("failed to scan role data")
-			}
+		user = &models.User{}
+		err := rows.Scan(
+			&user.ID, &user.Name, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.CreatedBy, &user.UpdatedAt, &user.UpdatedBy, &user.DeletedAt, &user.DeletedBy,
+			&role.ID, &role.Name, &role.CreatedAt, &role.CreatedBy, &role.UpdatedAt, &role.UpdatedBy, &role.DeletedAt, &role.DeletedBy,
+		)
+		if err != nil {
+			return nil, errors.New("failed to scan user and role")
 		}
 
 		roles = append(roles, role)

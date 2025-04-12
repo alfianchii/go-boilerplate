@@ -18,7 +18,7 @@ func SetupRouter(app *app.App) *chi.Mux {
 		r.Post("/login", app.AuthHandler.Login)
 
 		r.Group(func(r chi.Router) {
-			r.Use(middlewares.AuthMiddleware("admin", app.AuthService))
+			r.Use(middlewares.AuthMiddleware("admin", app.AuthService, app.SessionRepo))
 			r.Get("/dashboard", app.DashboardHandler.Dashboard)
 		})
 	})

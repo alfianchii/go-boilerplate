@@ -25,12 +25,14 @@ func (h *AuthHandler) Login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	ipAddress := utils.GetClientIP(req)
+
 	creds := models.LoginRequest{
 		Username: req.FormValue("username"),
 		Password: req.FormValue("password"),
 	}
 
-	token, err := h.authService.GenerateJWT(req.Context(), creds)
+	token, err := h.authService.GenerateJWT(req.Context(), creds, ipAddress)
 	if err != nil {
 		utils.SendResponse(res, err.Error(), http.StatusUnauthorized, nil)
 		return
